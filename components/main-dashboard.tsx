@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import {
   BookOpen, Calendar, Layers, MessageSquare,
-  ChevronRight, GraduationCap, ShieldCheck, LogOut
+  ChevronRight, GraduationCap, ShieldCheck, LogOut, Clock,
 } from 'lucide-react'
 import { DarkModeToggle } from './dark-mode-toggle'
 import { useApp } from '@/lib/app-context'
@@ -12,10 +12,23 @@ import { StudyPlanPage } from './pages/study-plan-page'
 import { SchedulePage } from './pages/schedule-page'
 import { SubjectsPage } from './pages/subjects-page'
 import { SuggestionsPage } from './pages/suggestions-page'
+import { TimetablePage } from './pages/timetable-page'
 
-type ActivePage = 'home' | 'study-plan' | 'schedule' | 'subjects' | 'suggestions'
+type ActivePage = 'home' | 'study-plan' | 'schedule' | 'subjects' | 'suggestions' | 'timetable'
 
 const cards = [
+  {
+    id: 'timetable' as const,
+    titleAr: 'جدول المحاضرات',
+    titleEn: 'Timetable',
+    year: '2026-2027م',
+    icon: Clock,
+    color: 'from-cyan-500/10 to-cyan-600/5',
+    borderColor: 'hover:border-cyan-400/50',
+    iconColor: 'text-cyan-500',
+    ringColor: 'hover:ring-cyan-400/20',
+    desc: 'جدول محاضرات الترم الأول',
+  },
   {
     id: 'study-plan' as const,
     titleAr: 'الخطة الدراسية',
@@ -95,6 +108,7 @@ export function MainDashboard() {
           onLogout={handleLogout}
         />
         <main className="max-w-5xl mx-auto px-4 py-6">
+          {activePage === 'timetable' && <TimetablePage />}
           {activePage === 'study-plan' && <StudyPlanPage />}
           {activePage === 'schedule' && <SchedulePage />}
           {activePage === 'subjects' && <SubjectsPage />}
@@ -224,6 +238,7 @@ function DashboardHeader({
 }) {
   const pageLabels: Record<ActivePage, string> = {
     home: 'الرئيسية',
+    timetable: 'جدول المحاضرات',
     'study-plan': 'الخطة الدراسية',
     schedule: 'اختبارات السنة 2026-2027م',
     subjects: 'المواد الدراسية والمحاضرات',
