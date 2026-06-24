@@ -7,19 +7,21 @@ import { DarkModeToggle } from './dark-mode-toggle'
 import { useApp } from '@/lib/app-context'
 import { MainDashboard } from './main-dashboard'
 
-const ADMIN_PASSWORD = 'M_saeed'
-
 export function WelcomePage() {
-  const { setIsAdmin } = useApp()
+  const { setIsAdmin, loginAdmin } = useApp()
   const [view, setView] = useState<'welcome' | 'admin-login' | 'dashboard' | 'admin-dashboard'>('welcome')
   const [password, setPassword] = useState('')
   const [showPw, setShowPw] = useState(false)
   const [error, setError] = useState(false)
   const [shake, setShake] = useState(false)
+  const [loading, setLoading] = useState(false)
 
-  const handleAdminLogin = () => {
-    if (password === ADMIN_PASSWORD) {
-      setIsAdmin(true)
+  const handleAdminLogin = async () => {
+    if (loading) return
+    setLoading(true)
+    const ok = await loginAdmin(password)
+    setLoading(false)
+    if (ok) {
       setView('admin-dashboard')
     } else {
       setError(true)
@@ -258,10 +260,12 @@ export function WelcomePage() {
               <div className="flex flex-col gap-3">
                 <button
                   onClick={handleAdminLogin}
+                  disabled={loading}
                   className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm
-                    hover:opacity-90 active:scale-95 transition-all duration-200 shadow-sm"
+                    hover:opacity-90 active:scale-95 transition-all duration-200 shadow-sm
+                    disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  دخول
+                  {loading ? 'جارٍ التحقق...' : 'دخول'}
                 </button>
                 <button
                   onClick={() => { setView('welcome'); setError(false); setPassword('') }}

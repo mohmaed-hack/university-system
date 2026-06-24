@@ -255,7 +255,15 @@ const defaultData: AppData = {
 interface AppContextType {
   data: AppData
   isAdmin: boolean
+  /** True while the initial data load is in progress. */
+  isLoading: boolean
+  /** True while a change is being committed to GitHub. */
+  isSaving: boolean
   setIsAdmin: (v: boolean) => void
+  /** Verifies the password on the server; returns true on success. */
+  loginAdmin: (password: string) => Promise<boolean>
+  /** Ends the admin session on the server. */
+  logoutAdmin: () => Promise<void>
   updateSemester1: (subjects: Subject[]) => void
   updateSemester2: (subjects: Subject[]) => void
   updateSchedule: (schedule: DaySchedule[]) => void
@@ -267,30 +275,93 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | null>(null)
 
-const STORAGE_KEY = 'uni_portal_data_v2'
-const ADMIN_KEY = 'uni_portal_admin'
-
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [data, setData] = useState<AppData>(defaultData)
   const [isAdmin, setIsAdminState] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isSaving, setIsSaving] = useState(false)
 
+  // Load the canonical data (from GitHub via the API) and restore session.
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY)
-      if (saved) setData(JSON.parse(saved))
-      const adminSaved = sessionStorage.getItem(ADMIN_KEY)
-      if (adminSaved === 'true') setIsAdminState(true)
-    } catch {}
+    let cancelled = false
+    ;(async () => {
+      try {
+        const [dataRes, sessionRes] = await Promise.all([
+          fetch('/api/data', { cache: 'no-store' }),
+          fetch('/api/admin/session', { cache: 'no-store' }),
+        ])
+        if (!cancelled && dataRes.ok) {
+          const json = await dataRes.json()
+          if (json?.data) setData(json.data as AppData)
+        }
+        if (!cancelled && sessionRes.ok) {
+          const json = await sessionRes.json()
+          setIsAdminState(Boolean(json?.isAdmin))
+        }
+      } catch {
+        // Keep default data if the request fails.
+      } finally {
+        if (!cancelled) setIsLoading(false)
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
   }, [])
 
-  const save = (d: AppData) => {
-    setData(d)
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)) } catch {}
+  /**
+   * Optimistically updates local state, then commits the full data set
+   * to GitHub through the API. On failure the previous state is restored.
+   */
+  const save = (next: AppData, message?: string) => {
+    const previous = data
+    setData(next)
+    setIsSaving(true)
+    ;(async () => {
+      try {
+        const res = await fetch('/api/data', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ data: next, message }),
+        })
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}))
+          console.log('[v0] Failed to save data:', err?.error)
+          setData(previous)
+        }
+      } catch (e) {
+        console.log('[v0] Error saving data:', e)
+        setData(previous)
+      } finally {
+        setIsSaving(false)
+      }
+    })()
   }
 
-  const setIsAdmin = (v: boolean) => {
-    setIsAdminState(v)
-    try { sessionStorage.setItem(ADMIN_KEY, String(v)) } catch {}
+  const setIsAdmin = (v: boolean) => setIsAdminState(v)
+
+  const loginAdmin = async (password: string): Promise<boolean> => {
+    try {
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      })
+      if (res.ok) {
+        setIsAdminState(true)
+        return true
+      }
+      return false
+    } catch {
+      return false
+    }
+  }
+
+  const logoutAdmin = async (): Promise<void> => {
+    try {
+      await fetch('/api/admin/logout', { method: 'POST' })
+    } catch {}
+    setIsAdminState(false)
   }
 
   return (
@@ -298,32 +369,42 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       value={{
         data,
         isAdmin,
+        isLoading,
+        isSaving,
         setIsAdmin,
-        updateSemester1: (s) => save({ ...data, semester1: s }),
-        updateSemester2: (s) => save({ ...data, semester2: s }),
-        updateSchedule: (s) => save({ ...data, schedule: s }),
-        updateSubjectMaterials: (m) => save({ ...data, subjectMaterials: m }),
+        loginAdmin,
+        logoutAdmin,
+        updateSemester1: (s) => save({ ...data, semester1: s }, 'chore(data): update semester 1 subjects'),
+        updateSemester2: (s) => save({ ...data, semester2: s }, 'chore(data): update semester 2 subjects'),
+        updateSchedule: (s) => save({ ...data, schedule: s }, 'chore(data): update schedule'),
+        updateSubjectMaterials: (m) => save({ ...data, subjectMaterials: m }, 'chore(data): update subject materials'),
         addSuggestion: (s) => {
           const newS: Suggestion = {
             ...s,
             id: Date.now().toString(),
             date: new Date().toISOString().split('T')[0],
           }
-          save({ ...data, suggestions: [...data.suggestions, newS] })
+          save({ ...data, suggestions: [...data.suggestions, newS] }, 'chore(data): add suggestion')
         },
         addReply: (id, reply) => {
-          save({
-            ...data,
-            suggestions: data.suggestions.map((s) =>
-              s.id === id ? { ...s, reply } : s,
-            ),
-          })
+          save(
+            {
+              ...data,
+              suggestions: data.suggestions.map((s) =>
+                s.id === id ? { ...s, reply } : s,
+              ),
+            },
+            'chore(data): reply to suggestion',
+          )
         },
         deleteSuggestion: (id) => {
-          save({
-            ...data,
-            suggestions: data.suggestions.filter((s) => s.id !== id),
-          })
+          save(
+            {
+              ...data,
+              suggestions: data.suggestions.filter((s) => s.id !== id),
+            },
+            'chore(data): delete suggestion',
+          )
         },
       }}
     >
