@@ -135,7 +135,16 @@
       "image": "/images/subjects/it-project-management.png",
       "semester": 1,
       "bookUrl": null,
-      "lecturesTheory": [],
+      "lecturesTheory": [
+        {
+          "number": 1,
+          "title": "test",
+          "date": "2026-06-24",
+          "downloadUrl": "https://drive.google.com/uc?id=1JMyLdAjJ7zgnKF5dQeKJ9EwIkRfEl46t&export=download",
+          "type": "theory",
+          "id": "l-1782341008180"
+        }
+      ],
       "lecturesPractical": []
     },
     {
