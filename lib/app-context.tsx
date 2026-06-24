@@ -3,13 +3,19 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
 
 // ── Types ─────────────────────────────────────────────────
+export interface SubjectInstructor {
+  nameAr: string
+  nameEn?: string
+}
+
 export interface Subject {
   id: string
   nameEn: string
   nameAr: string
-  /** Path relative to /public, e.g. /images/subjects/software-engineering.png */
   image: string
-  doctor: string
+  side: 'نظري فقط' | 'نظري + عملي'
+  instructorTheory?: SubjectInstructor
+  instructorPractical?: SubjectInstructor
 }
 
 export interface DaySchedule {
@@ -35,12 +41,15 @@ export interface Suggestion {
 
 /**
  * A lecture inside a subject.
- * Add more items to the `lectures` array to show additional lectures.
  */
 export interface Lecture {
   id: string
+  number: number
   title: string
+  date: string
   downloadUrl: string
+  videoUrl?: string
+  type: 'theory' | 'practical'
 }
 
 export interface SubjectMaterial {
@@ -67,7 +76,6 @@ export interface AppData {
 }
 
 // ── Default Data ──────────────────────────────────────────
-const DEFAULT_DOCTOR = 'الدكتورة ياسمين محمد'
 const DEFAULT_LECTURE_URL =
   'https://drive.google.com/file/d/14Ed0rrA4vsoao5RMe01qbOTN7mypoTX9/view?usp=drivesdk'
 
@@ -79,42 +87,51 @@ const defaultData: AppData = {
       nameEn: 'Software Engineering',
       nameAr: 'هندسة البرمجيات',
       image: '/images/subjects/software-engineering.png',
-      doctor: DEFAULT_DOCTOR,
+      side: 'نظري فقط' as const,
+      instructorTheory: { nameAr: 'د. محمد الخولاني' },
     },
     {
       id: 's1-2',
-      nameEn: 'IT Project Management',
+      nameEn: 'IT Projects Management',
       nameAr: 'إدارة مشاريع تقنية المعلومات',
       image: '/images/subjects/it-project-management.png',
-      doctor: DEFAULT_DOCTOR,
+      side: 'نظري فقط' as const,
+      instructorTheory: { nameAr: 'أ. يمن' },
     },
     {
       id: 's1-3',
       nameEn: 'Business Intelligence',
       nameAr: 'ذكاء الأعمال',
       image: '/images/subjects/business-intelligence.png',
-      doctor: DEFAULT_DOCTOR,
+      side: 'نظري + عملي' as const,
+      instructorTheory: { nameAr: 'د. قيس النزيلي' },
+      instructorPractical: { nameAr: 'أ. دلال' },
     },
     {
       id: 's1-4',
-      nameEn: 'Developing Database Applications',
+      nameEn: 'Developing Database Applications (MySQL)',
       nameAr: 'تطوير تطبيقات قواعد البيانات',
       image: '/images/subjects/developing-database-applications.png',
-      doctor: DEFAULT_DOCTOR,
+      side: 'نظري + عملي' as const,
+      instructorTheory: { nameAr: 'أ. أسماء' },
+      instructorPractical: { nameAr: 'أ. أسماء' },
     },
     {
       id: 's1-5',
       nameEn: 'Information Technology Management',
       nameAr: 'إدارة تقنية المعلومات',
       image: '/images/subjects/it-management.png',
-      doctor: DEFAULT_DOCTOR,
+      side: 'نظري فقط' as const,
+      instructorTheory: { nameAr: 'أ. زايد' },
     },
     {
       id: 's1-6',
       nameEn: 'Cloud Computing and Web Services',
       nameAr: 'الحوسبة السحابية وخدمات الويب',
       image: '/images/subjects/cloud-computing.png',
-      doctor: DEFAULT_DOCTOR,
+      side: 'نظري + عملي' as const,
+      instructorTheory: { nameAr: 'د. محمد' },
+      instructorPractical: { nameAr: 'أ. مريم' },
     },
   ],
 
@@ -125,35 +142,35 @@ const defaultData: AppData = {
       nameEn: 'Open Source Concepts & Programming',
       nameAr: 'مفاهيم البرمجة مفتوحة المصدر',
       image: '/images/subjects/open-source.png',
-      doctor: DEFAULT_DOCTOR,
+      side: 'نظري فقط' as const,
     },
     {
       id: 's2-2',
       nameEn: 'Research Methods',
       nameAr: 'مناهج البحث العلمي',
       image: '/images/subjects/research-methods.png',
-      doctor: DEFAULT_DOCTOR,
+      side: 'نظري فقط' as const,
     },
     {
       id: 's2-3',
       nameEn: 'Industrial Training',
       nameAr: 'التدريب الميداني',
       image: '/images/subjects/industrial-training.png',
-      doctor: DEFAULT_DOCTOR,
+      side: 'نظري فقط' as const,
     },
     {
       id: 's2-4',
       nameEn: 'Human Computer Interaction',
       nameAr: 'تفاعل الإنسان والحاسب',
       image: '/images/subjects/human-computer-interaction.png',
-      doctor: DEFAULT_DOCTOR,
+      side: 'نظري فقط' as const,
     },
     {
       id: 's2-5',
       nameEn: 'Enterprise Application Development',
       nameAr: 'تطوير تطبيقات المؤسسات',
       image: '/images/subjects/enterprise-app-development.png',
-      doctor: DEFAULT_DOCTOR,
+      side: 'نظري فقط' as const,
     },
   ],
 
@@ -168,27 +185,19 @@ const defaultData: AppData = {
       nameAr: 'هندسة البرمجيات',
       image: '/images/subjects/software-engineering.png',
       semester: 1,
-      bookUrl: 'https://drive.google.com/file/d/14Ed0rrA4vsoao5RMe01qbOTN7mypoTX9/view?usp=drivesdk',
-      lecturesTheory: [
-        { id: 'lt-1', title: 'المحاضرة الأولى', downloadUrl: DEFAULT_LECTURE_URL },
-      ],
-      lecturesPractical: [
-        { id: 'lp-1', title: 'المحاضرة الأولى', downloadUrl: DEFAULT_LECTURE_URL },
-      ],
+      bookUrl: undefined,
+      lecturesTheory: [],
+      lecturesPractical: [],
     },
     {
       id: 'sm-s1-2',
-      nameEn: 'IT Project Management',
+      nameEn: 'IT Projects Management',
       nameAr: 'إدارة مشاريع تقنية المعلومات',
       image: '/images/subjects/it-project-management.png',
       semester: 1,
-      bookUrl: 'https://drive.google.com/file/d/14Ed0rrA4vsoao5RMe01qbOTN7mypoTX9/view?usp=drivesdk',
-      lecturesTheory: [
-        { id: 'lt-1', title: 'المحاضرة الأولى', downloadUrl: DEFAULT_LECTURE_URL },
-      ],
-      lecturesPractical: [
-        { id: 'lp-1', title: 'المحاضرة الأولى', downloadUrl: DEFAULT_LECTURE_URL },
-      ],
+      bookUrl: undefined,
+      lecturesTheory: [],
+      lecturesPractical: [],
     },
     {
       id: 'sm-s1-3',
@@ -196,27 +205,19 @@ const defaultData: AppData = {
       nameAr: 'ذكاء الأعمال',
       image: '/images/subjects/business-intelligence.png',
       semester: 1,
-      bookUrl: 'https://drive.google.com/file/d/14Ed0rrA4vsoao5RMe01qbOTN7mypoTX9/view?usp=drivesdk',
-      lecturesTheory: [
-        { id: 'lt-1', title: 'المحاضرة الأولى', downloadUrl: DEFAULT_LECTURE_URL },
-      ],
-      lecturesPractical: [
-        { id: 'lp-1', title: 'المحاضرة الأولى', downloadUrl: DEFAULT_LECTURE_URL },
-      ],
+      bookUrl: undefined,
+      lecturesTheory: [],
+      lecturesPractical: [],
     },
     {
       id: 'sm-s1-4',
-      nameEn: 'Developing Database Applications',
+      nameEn: 'Developing Database Applications (MySQL)',
       nameAr: 'تطوير تطبيقات قواعد البيانات',
       image: '/images/subjects/developing-database-applications.png',
       semester: 1,
-      bookUrl: 'https://drive.google.com/file/d/14Ed0rrA4vsoao5RMe01qbOTN7mypoTX9/view?usp=drivesdk',
-      lecturesTheory: [
-        { id: 'lt-1', title: 'المحاضرة الأولى', downloadUrl: DEFAULT_LECTURE_URL },
-      ],
-      lecturesPractical: [
-        { id: 'lp-1', title: 'المحاضرة الأولى', downloadUrl: DEFAULT_LECTURE_URL },
-      ],
+      bookUrl: undefined,
+      lecturesTheory: [],
+      lecturesPractical: [],
     },
     {
       id: 'sm-s1-5',
@@ -224,13 +225,9 @@ const defaultData: AppData = {
       nameAr: 'إدارة تقنية المعلومات',
       image: '/images/subjects/it-management.png',
       semester: 1,
-      bookUrl: 'https://drive.google.com/file/d/14Ed0rrA4vsoao5RMe01qbOTN7mypoTX9/view?usp=drivesdk',
-      lecturesTheory: [
-        { id: 'lt-1', title: 'المحاضرة الأولى', downloadUrl: DEFAULT_LECTURE_URL },
-      ],
-      lecturesPractical: [
-        { id: 'lp-1', title: 'المحاضرة الأولى', downloadUrl: DEFAULT_LECTURE_URL },
-      ],
+      bookUrl: undefined,
+      lecturesTheory: [],
+      lecturesPractical: [],
     },
     {
       id: 'sm-s1-6',
@@ -238,13 +235,9 @@ const defaultData: AppData = {
       nameAr: 'الحوسبة السحابية وخدمات الويب',
       image: '/images/subjects/cloud-computing.png',
       semester: 1,
-      bookUrl: 'https://drive.google.com/file/d/14Ed0rrA4vsoao5RMe01qbOTN7mypoTX9/view?usp=drivesdk',
-      lecturesTheory: [
-        { id: 'lt-1', title: 'المحاضرة الأولى', downloadUrl: DEFAULT_LECTURE_URL },
-      ],
-      lecturesPractical: [
-        { id: 'lp-1', title: 'المحاضرة الأولى', downloadUrl: DEFAULT_LECTURE_URL },
-      ],
+      bookUrl: undefined,
+      lecturesTheory: [],
+      lecturesPractical: [],
     },
   ],
 

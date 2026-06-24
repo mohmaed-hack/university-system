@@ -54,15 +54,15 @@ const cards = [
   },
   {
     id: 'suggestions' as const,
-    titleAr: 'الآراء والاقتراحات',
-    titleEn: 'Opinions & Suggestions',
+    titleAr: 'الاستفسار والتواصل',
+    titleEn: 'Contact & Inquiry',
     year: '',
     icon: MessageSquare,
     color: 'from-orange-500/10 to-orange-600/5',
     borderColor: 'hover:border-orange-400/50',
     iconColor: 'text-orange-500',
     ringColor: 'hover:ring-orange-400/20',
-    desc: 'شاركنا آراءك واقتراحاتك',
+    desc: 'تواصل معنا واستفسر',
   },
 ]
 
@@ -227,7 +227,7 @@ function DashboardHeader({
     'study-plan': 'الخطة الدراسية',
     schedule: 'اختبارات السنة 2026-2027م',
     subjects: 'المواد الدراسية والمحاضرات',
-    suggestions: 'الآراء والاقتراحات',
+    suggestions: 'الاستفسار والتواصل',
   }
 
   return (

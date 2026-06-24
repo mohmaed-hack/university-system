@@ -1,10 +1,18 @@
 'use client'
 
 import { useState } from 'react'
-import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { BookOpen, GraduationCap } from 'lucide-react'
+import {
+  BookOpen,
+  ChevronRight,
+  User,
+  FlaskConical,
+  BookText,
+  Sparkles,
+} from 'lucide-react'
 import { useApp, type Subject } from '@/lib/app-context'
+import { cn } from '@/lib/utils'
 
 type SemesterView = null | 1 | 2
 
@@ -32,9 +40,14 @@ export function StudyPlanPage() {
             onClick={() => setSemView(sem)}
             className="group relative flex flex-col gap-5 p-7 rounded-2xl border border-border bg-card
               cursor-pointer hover:scale-[1.02] hover:shadow-xl hover:border-primary/40
-              transition-all duration-300 text-start focus:outline-none focus:ring-2 focus:ring-primary/30"
+              transition-all duration-300 text-start focus:outline-none focus:ring-2 focus:ring-primary/30
+              overflow-hidden"
           >
-            <div className="flex items-center justify-between">
+            {/* Decorative background */}
+            <div className="absolute top-0 left-0 w-32 h-32 rounded-full bg-primary/5 -translate-x-1/2 -translate-y-1/2
+              group-hover:scale-150 group-hover:bg-primary/10 transition-all duration-500" />
+
+            <div className="relative flex items-center justify-between">
               <div className="flex items-center justify-center size-14 rounded-xl bg-primary/10
                 group-hover:bg-primary/15 transition-colors duration-300">
                 <BookOpen className="size-7 text-primary group-hover:scale-110 transition-transform duration-300" strokeWidth={1.5} />
@@ -44,7 +57,8 @@ export function StudyPlanPage() {
                 <p className="text-3xl font-black text-primary">{sem}</p>
               </div>
             </div>
-            <div>
+
+            <div className="relative">
               <h3 className="text-xl font-black text-foreground">
                 {sem === 1 ? 'الترم الأول' : 'الترم الثاني'}
               </h3>
@@ -57,10 +71,11 @@ export function StudyPlanPage() {
                   : 'الفصل الدراسي الثاني — ٢٠٢٧م'}
               </p>
             </div>
-            <div className="flex items-center gap-1.5 text-xs text-primary/80 font-semibold
+
+            <div className="relative flex items-center gap-1.5 text-xs text-primary/80 font-semibold
               opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               <span>عرض المواد</span>
-              <span>→</span>
+              <ChevronRight className="size-3.5" />
             </div>
           </motion.button>
         ))}
@@ -76,9 +91,15 @@ function SemesterDetail({
   semester: 1 | 2
   onBack: () => void
 }) {
+  const router = useRouter()
   const { data, isAdmin, updateSemester1, updateSemester2 } = useApp()
   const subjects = semester === 1 ? data.semester1 : data.semester2
   const updateFn = semester === 1 ? updateSemester1 : updateSemester2
+
+  const handleBack = () => {
+    onBack()
+    router.back()
+  }
 
   const handleDelete = (id: string) => {
     updateFn(subjects.filter((s) => s.id !== id))
@@ -86,16 +107,27 @@ function SemesterDetail({
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Header */}
-      <div className="flex flex-col gap-1">
-        <h2 className="text-2xl font-black text-foreground">
-          {semester === 1
-            ? 'الترم الأول — Semester One'
-            : 'الترم الثاني — Semester Two'}
-        </h2>
-        <p className="text-muted-foreground text-sm">
-          {subjects.length} {subjects.length === 1 ? 'مادة' : 'مواد'}
-        </p>
+      {/* Header with back button */}
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-col gap-1">
+          <h2 className="text-2xl font-black text-foreground">
+            {semester === 1
+              ? 'الترم الأول — Semester One'
+              : 'الترم الثاني — Semester Two'}
+          </h2>
+          <p className="text-muted-foreground text-sm">
+            {subjects.length} {subjects.length === 1 ? 'مادة' : 'مواد'}
+          </p>
+        </div>
+        <button
+          onClick={handleBack}
+          className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-card border border-border
+            text-muted-foreground hover:text-foreground hover:border-primary/40
+            transition-colors duration-200 text-sm font-semibold"
+        >
+          <ChevronRight className="size-4" />
+          رجوع
+        </button>
       </div>
 
       {/* Cards grid */}
@@ -110,6 +142,7 @@ function SemesterDetail({
             <SubjectCard
               key={subject.id}
               subject={subject}
+              semester={semester}
               isAdmin={isAdmin}
               onDelete={handleDelete}
               onUpdate={(updated) =>
@@ -123,6 +156,7 @@ function SemesterDetail({
       {/* Add new subject — admin only */}
       {isAdmin && (
         <AddSubjectForm
+          semester={semester}
           onAdd={(s) => updateFn([...subjects, s])}
         />
       )}
@@ -133,17 +167,22 @@ function SemesterDetail({
 // ── Subject Card ──────────────────────────────────────────
 function SubjectCard({
   subject,
+  semester,
   isAdmin,
   onDelete,
   onUpdate,
 }: {
   subject: Subject
+  semester: 1 | 2
   isAdmin: boolean
   onDelete: (id: string) => void
   onUpdate: (s: Subject) => void
 }) {
   const [editing, setEditing] = useState(false)
   const [form, setForm] = useState<Subject>(subject)
+
+  const isTheoryOnly = subject.side === 'نظري فقط'
+  const hasInstructor = subject.instructorTheory || subject.instructorPractical
 
   if (editing) {
     return (
@@ -166,24 +205,33 @@ function SubjectCard({
             value={form.nameAr}
             onChange={(e) => setForm((f) => ({ ...f, nameAr: e.target.value }))}
           />
-          <label className="text-xs text-muted-foreground font-semibold">اسم الدكتور</label>
+          <label className="text-xs text-muted-foreground font-semibold">الجانب</label>
+          <select
+            className="px-3 py-2 text-sm rounded-lg border border-border bg-background focus:outline-none focus:ring-1 focus:ring-primary/40"
+            value={form.side}
+            onChange={(e) => setForm((f) => ({ ...f, side: e.target.value as 'نظري فقط' | 'نظري + عملي' }))}
+          >
+            <option value="نظري فقط">نظري فقط</option>
+            <option value="نظري + عملي">نظري + عملي</option>
+          </select>
+          <label className="text-xs text-muted-foreground font-semibold">الدكتور/ة النظري</label>
           <input
             className="px-3 py-2 text-sm rounded-lg border border-border bg-background focus:outline-none focus:ring-1 focus:ring-primary/40"
-            value={form.doctor}
-            onChange={(e) => setForm((f) => ({ ...f, doctor: e.target.value }))}
+            value={form.instructorTheory?.nameAr || ''}
+            onChange={(e) => setForm((f) => ({ ...f, instructorTheory: { nameAr: e.target.value } }))}
+            placeholder="د. اسم الدكتور"
           />
-          <label className="text-xs text-muted-foreground font-semibold">
-            مسار الصورة{' '}
-            <span className="text-muted-foreground/50 font-normal">
-              (مثال: /images/subjects/my-subject.png)
-            </span>
-          </label>
-          <input
-            dir="ltr"
-            className="px-3 py-2 text-sm rounded-lg border border-border bg-background focus:outline-none focus:ring-1 focus:ring-primary/40 font-mono"
-            value={form.image}
-            onChange={(e) => setForm((f) => ({ ...f, image: e.target.value }))}
-          />
+          {form.side === 'نظري + عملي' && (
+            <>
+              <label className="text-xs text-muted-foreground font-semibold">الدكتور/ة العملي</label>
+              <input
+                className="px-3 py-2 text-sm rounded-lg border border-border bg-background focus:outline-none focus:ring-1 focus:ring-primary/40"
+                value={form.instructorPractical?.nameAr || ''}
+                onChange={(e) => setForm((f) => ({ ...f, instructorPractical: { nameAr: e.target.value } }))}
+                placeholder="أ. اسم المعيد"
+              />
+            </>
+          )}
         </div>
         <div className="flex gap-2 mt-1">
           <button
@@ -209,29 +257,92 @@ function SubjectCard({
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.92 }}
-      className="group bg-card border border-border rounded-2xl overflow-hidden
-        hover:border-primary/30 hover:shadow-lg transition-all duration-300"
+      className={cn(
+        'group relative bg-card border rounded-2xl overflow-hidden',
+        'hover:shadow-xl transition-all duration-300',
+        isTheoryOnly
+          ? 'border-blue-500/20 hover:border-blue-400/50'
+          : 'border-emerald-500/20 hover:border-emerald-400/50',
+      )}
     >
-      {/* Subject image */}
-      <div className="relative w-full aspect-video bg-muted overflow-hidden">
-        <Image
-          src={subject.image}
-          alt={subject.nameEn}
-          fill
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-        />
+      {/* Subject icon header */}
+      <div className={cn(
+        'relative flex items-center justify-center h-28',
+        isTheoryOnly
+          ? 'bg-gradient-to-br from-blue-500/10 via-blue-500/5 to-transparent'
+          : 'bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-transparent',
+      )}>
+        <div className={cn(
+          'flex items-center justify-center size-16 rounded-2xl',
+          isTheoryOnly
+            ? 'bg-blue-500/15'
+            : 'bg-emerald-500/15',
+        )}>
+          {isTheoryOnly ? (
+            <BookText className="size-8 text-blue-500" strokeWidth={1.5} />
+          ) : (
+            <FlaskConical className="size-8 text-emerald-500" strokeWidth={1.5} />
+          )}
+        </div>
+
+        {/* Side badge */}
+        <div className={cn(
+          'absolute top-3 right-3 px-2.5 py-1 rounded-full text-[10px] font-bold',
+          isTheoryOnly
+            ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400'
+            : 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400',
+        )}>
+          {subject.side}
+        </div>
+
+        {/* Decorative sparkle */}
+        <Sparkles className="absolute bottom-2 left-3 size-4 text-muted-foreground/20" />
       </div>
 
       {/* Info */}
-      <div className="p-4 flex flex-col gap-2">
-        <h3 className="font-bold text-foreground text-sm leading-snug line-clamp-2">
-          {subject.nameEn}
-        </h3>
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-          <GraduationCap className="size-3.5 shrink-0" strokeWidth={1.5} />
-          <span>{subject.doctor}</span>
+      <div className="p-4 flex flex-col gap-3">
+        {/* Subject names */}
+        <div className="flex flex-col gap-0.5">
+          <h3 className="font-bold text-foreground text-sm leading-snug" dir="ltr">
+            {subject.nameEn}
+          </h3>
+          <p className="text-xs text-muted-foreground">{subject.nameAr}</p>
         </div>
+
+        {/* Instructor info - only show for semester 1 or if available */}
+        {semester === 1 && hasInstructor && (
+          <div className="flex flex-col gap-2 pt-2 border-t border-border/50">
+            {/* Theory instructor */}
+            {subject.instructorTheory && (
+              <div className="flex items-center gap-2">
+                <div className="flex items-center justify-center size-6 rounded-lg bg-blue-500/10">
+                  <User className="size-3 text-blue-500" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[10px] text-muted-foreground font-medium">النظري</span>
+                  <span className="text-xs font-semibold text-foreground">
+                    {subject.instructorTheory.nameAr}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Practical instructor */}
+            {subject.side === 'نظري + عملي' && subject.instructorPractical && (
+              <div className="flex items-center gap-2">
+                <div className="flex items-center justify-center size-6 rounded-lg bg-emerald-500/10">
+                  <FlaskConical className="size-3 text-emerald-500" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[10px] text-muted-foreground font-medium">العملي</span>
+                  <span className="text-xs font-semibold text-foreground">
+                    {subject.instructorPractical.nameAr}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Admin actions */}
         {isAdmin && (
@@ -258,20 +369,35 @@ function SubjectCard({
 }
 
 // ── Add Subject Form (admin) ──────────────────────────────
-function AddSubjectForm({ onAdd }: { onAdd: (s: Subject) => void }) {
+function AddSubjectForm({
+  semester,
+  onAdd,
+}: {
+  semester: 1 | 2
+  onAdd: (s: Subject) => void
+}) {
   const [open, setOpen] = useState(false)
   const [form, setForm] = useState<Omit<Subject, 'id'>>({
     nameEn: '',
     nameAr: '',
     image: '/images/subjects/',
-    doctor: 'الدكتورة ياسمين محمد',
+    side: 'نظري فقط',
+    instructorTheory: undefined,
+    instructorPractical: undefined,
   })
 
   const handleAdd = () => {
     if (!form.nameEn || !form.nameAr) return
     onAdd({ ...form, id: Date.now().toString() })
     setOpen(false)
-    setForm({ nameEn: '', nameAr: '', image: '/images/subjects/', doctor: 'الدكتورة ياسمين محمد' })
+    setForm({
+      nameEn: '',
+      nameAr: '',
+      image: '/images/subjects/',
+      side: 'نظري فقط',
+      instructorTheory: undefined,
+      instructorPractical: undefined,
+    })
   }
 
   if (!open) {
@@ -315,21 +441,18 @@ function AddSubjectForm({ onAdd }: { onAdd: (s: Subject) => void }) {
           />
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-xs font-semibold text-muted-foreground">اسم الدكتور</label>
-          <input
+          <label className="text-xs font-semibold text-muted-foreground">الجانب</label>
+          <select
             className="px-3 py-2 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-1 focus:ring-primary/40"
-            value={form.doctor}
-            onChange={(e) => setForm((f) => ({ ...f, doctor: e.target.value }))}
-            placeholder="الدكتورة ياسمين محمد"
-          />
+            value={form.side}
+            onChange={(e) => setForm((f) => ({ ...f, side: e.target.value as 'نظري فقط' | 'نظري + عملي' }))}
+          >
+            <option value="نظري فقط">نظري فقط</option>
+            <option value="نظري + عملي">نظري + عملي</option>
+          </select>
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-xs font-semibold text-muted-foreground">
-            مسار الصورة{' '}
-            <span className="text-muted-foreground/50 font-normal text-[10px]">
-              (/images/subjects/name.png)
-            </span>
-          </label>
+          <label className="text-xs font-semibold text-muted-foreground">مسار الصورة</label>
           <input
             dir="ltr"
             className="px-3 py-2 rounded-lg border border-border bg-background text-sm font-mono focus:outline-none focus:ring-1 focus:ring-primary/40"
@@ -338,6 +461,30 @@ function AddSubjectForm({ onAdd }: { onAdd: (s: Subject) => void }) {
             placeholder="/images/subjects/name.png"
           />
         </div>
+        {semester === 1 && (
+          <>
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-semibold text-muted-foreground">الدكتور/ة النظري</label>
+              <input
+                className="px-3 py-2 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-1 focus:ring-primary/40"
+                value={form.instructorTheory?.nameAr || ''}
+                onChange={(e) => setForm((f) => ({ ...f, instructorTheory: { nameAr: e.target.value } }))}
+                placeholder="د. اسم الدكتور"
+              />
+            </div>
+            {form.side === 'نظري + عملي' && (
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-semibold text-muted-foreground">الدكتور/ة العملي</label>
+                <input
+                  className="px-3 py-2 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-1 focus:ring-primary/40"
+                  value={form.instructorPractical?.nameAr || ''}
+                  onChange={(e) => setForm((f) => ({ ...f, instructorPractical: { nameAr: e.target.value } }))}
+                  placeholder="أ. اسم المعيد"
+                />
+              </div>
+            )}
+          </>
+        )}
       </div>
       <div className="flex gap-2">
         <button
