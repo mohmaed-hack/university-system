@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "gethub": {
+      "enabled": false
+    }
+  }
+}
