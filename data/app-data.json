@@ -97,7 +97,7 @@
       "nameAr": "هندسة البرمجيات",
       "image": "/images/subjects/software-engineering.png",
       "semester": 1,
-      "bookUrl": null,
+      "bookUrl": "https://drive.google.com/uc?export=download&id=1n88RA2lhpaGQa5Qz-1V3249RLXWJRAuq",
       "lecturesTheory": [],
       "lecturesPractical": []
     },
@@ -127,7 +127,7 @@
       "nameAr": "تطوير تطبيقات قواعد البيانات",
       "image": "/images/subjects/developing-database-applications.png",
       "semester": 1,
-      "bookUrl": null,
+      "bookUrl": "https://drive.google.com/uc?export=download&id=1JMiWhTTtB5FhnVI5reIlSAakRsyPbhv8",
       "lecturesTheory": [],
       "lecturesPractical": []
     },

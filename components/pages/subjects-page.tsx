@@ -304,16 +304,21 @@ function SubjectDetailModal({
 
             {/* Book button */}
             <button
-              onClick={() => setShowBookModal(true)}
-              className="flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl
-                bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold text-sm
-                border border-amber-400/20 hover:bg-amber-500/20 hover:border-amber-400/40
-                transition-all duration-200"
-            >
-              <Book className="size-4" />
-              تحميل الكتاب
+              onClick={() => {
+               if (subject.bookUrl) {
+                window.open(subject.bookUrl, "_blank");
+                } else {
+                setShowBookModal(true);
+                }
+              }}
+              className="flex items-center justify-center gap-2 w-full py-3 rounded-xl
+                bg-primary text-primary-foreground font-bold text-sm
+                hover:opacity-90 active:scale-[0.98] transition-all duration-200"
+               >
+               <Book className="size-4" />
+               تحميل الكتاب
             </button>
-
+            
             {/* Lectures section */}
             <div className="flex flex-col gap-3">
               {isTheoryOnly ? (
