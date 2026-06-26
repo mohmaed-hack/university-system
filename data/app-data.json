@@ -145,7 +145,16 @@
       "image": "/images/subjects/business-intelligence.png",
       "semester": 1,
       "bookUrl": null,
-      "lecturesTheory": [],
+      "lecturesTheory": [
+        {
+          "number": 1,
+          "title": "1 intro BI",
+          "date": "2026-06-24",
+          "downloadUrl": "https://drive.google.com/uc?export=download&id=1KUmdiNpqmBUCb6M9odXSuj8UnEq3fuJ-",
+          "type": "theory",
+          "id": "l-1782517085872"
+        }
+      ],
       "lecturesPractical": []
     },
     {
