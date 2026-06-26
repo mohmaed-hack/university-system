@@ -116,7 +116,16 @@
       "image": "/images/subjects/software-engineering.png",
       "semester": 1,
       "bookUrl": "https://drive.google.com/uc?export=download&id=1n88RA2lhpaGQa5Qz-1V3249RLXWJRAuq",
-      "lecturesTheory": [],
+      "lecturesTheory": [
+        {
+          "number": 1,
+          "title": "Introduction to software engneering emirates",
+          "date": "2026-06-20",
+          "downloadUrl": "https://drive.google.com/uc?export=download&id=1KS5WiVTJSrz8IWAwD6nnRT1QeruimvVY",
+          "type": "theory",
+          "id": "l-1782517040022"
+        }
+      ],
       "lecturesPractical": []
     },
     {
