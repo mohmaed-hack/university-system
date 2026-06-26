@@ -156,7 +156,16 @@
           "id": "l-1782516342713"
         }
       ],
-      "lecturesPractical": []
+      "lecturesPractical": [
+        {
+          "number": 1,
+          "title": "Lap_1",
+          "date": "2026-06-22",
+          "downloadUrl": "https://drive.google.com/uc?export=download&id=1KcyNy4CGtdWD_dd97CzkXen6oBkYFfS1",
+          "type": "practical",
+          "id": "l-1782516947148"
+        }
+      ]
     },
     {
       "id": "sm-s1-5",
