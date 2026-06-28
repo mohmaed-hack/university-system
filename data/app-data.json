@@ -138,7 +138,16 @@
       "image": "/images/subjects/it-project-management.png",
       "semester": 1,
       "bookUrl": "https://drive.google.com/uc?export=download&id=1lm511qj_0etV2AqKlySElVQeclZ5Ps6R",
-      "lecturesTheory": [],
+      "lecturesTheory": [
+        {
+          "number": 1,
+          "title": "البيانات والمعلومات ",
+          "date": "2026-06-27",
+          "downloadUrl": "https://drive.google.com/uc?export=download&id=1Ljr91wZ-co0snto0ESzT7kA_XfrNs-nX",
+          "type": "theory",
+          "id": "l-1782666840767"
+        }
+      ],
       "lecturesPractical": []
     },
     {
