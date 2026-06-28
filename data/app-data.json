@@ -25,12 +25,12 @@
       "nameEn": "Business Intelligence",
       "nameAr": "ذكاء الأعمال",
       "image": "/images/subjects/business-intelligence.png",
-      "side": "نظري + عملي",
+      "side": "نظري فقط",
       "instructorTheory": {
         "nameAr": "د. قيس النزيلي"
       },
       "instructorPractical": {
-        "nameAr": "أ. دلال"
+        "nameAr": ""
       }
     },
     {
