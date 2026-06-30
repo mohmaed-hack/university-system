@@ -93,14 +93,6 @@ const timetableData: DaySchedule[] = [
     dayEn: 'Wednesday',
     lectures: [
       {
-        time: '8:00 - 10:00',
-        nameEn: 'IT Projects Management',
-        nameAr: 'إدارة مشاريع تقنية المعلومات',
-        type: 'نظري',
-        instructor: 'أ. يمن',
-        room: 'Hall 7',
-      },
-      {
         time: '11:00 - 2:00',
         nameEn: 'Business Intelligence',
         nameAr: 'ذكاء الأعمال',
@@ -124,6 +116,14 @@ const timetableData: DaySchedule[] = [
     lectures: [
       {
         time: '8:00 - 10:00',
+        nameEn: 'IT Projects Management',
+        nameAr: 'إدارة مشاريع تقنية المعلومات',
+        type: 'نظري',
+        instructor: 'د. حسن الجرادي',
+        room: 'Hall 2',
+      },
+      {
+        time: '10:00 - 12:00',
         nameEn: 'Cloud Computing and Web Services',
         nameAr: 'الحوسبة السحابية وخدمات الويب',
         type: 'عملي',
@@ -131,7 +131,7 @@ const timetableData: DaySchedule[] = [
         room: 'Lab 6 GB',
       },
       {
-        time: '10:00 - 12:00',
+        time: '12:00 - 2:00',
         nameEn: 'IT Projects Management',
         nameAr: 'إدارة مشاريع تقنية المعلومات',
         type: 'عملي',
@@ -139,7 +139,7 @@ const timetableData: DaySchedule[] = [
         room: 'Lab 4 GB',
       },
       {
-        time: '8:00 - 10:00',
+        time: '10:00 - 12:00',
         nameEn: 'IT Projects Management',
         nameAr: 'إدارة مشاريع تقنية المعلومات',
         type: 'عملي',
@@ -154,8 +154,7 @@ const timetableData: DaySchedule[] = [
         instructor: 'أ. مريم',
         room: 'Lab 6 GA',
       },
-    ],
-  },
+    ],  },
 ]
 
 const DOWNLOAD_URL: string | null = 'https://drive.google.com/uc?export=download&id=1KOj2kNqDxaMxhZrrHSZFr-5b_u9zzOHV'
