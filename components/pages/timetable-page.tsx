@@ -157,7 +157,7 @@ const timetableData: DaySchedule[] = [
     ],  },
 ]
 
-const DOWNLOAD_URL: string | null = 'https://drive.google.com/uc?export=download&id=1KOj2kNqDxaMxhZrrHSZFr-5b_u9zzOHV'
+const DOWNLOAD_URL: string | null = 'https://drive.google.com/uc?export=download&id=1MENlkQ4AIT4Fh2cnducy99rP8k1ddvRG'
 
 // ── Stats ─────────────────────────────────────────────────
 const stats = {
