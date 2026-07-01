@@ -154,6 +154,14 @@
           "downloadUrl": "https://www.dropbox.com/scl/fi/6w5ey69ft5j8ywjonkd3i/Introduction-to-MySQL.pdf?rlkey=ddxnfxihj2wxnta8ecvq01r6z&st=9ztp3xu3&dl=1",
           "type": "theory",
           "id": "l-1782940248867"
+        },
+        {
+          "number": 1,
+          "title": "ESSENTIAL OF MYSQL",
+          "date": "2026-07-01",
+          "downloadUrl": "https://www.dropbox.com/scl/fi/h6rc4vi4wwzhkzgrx1952/ESSENTIALS-OF-MYSQL.pdf?rlkey=lr24zeluhp1r83ty9tzawvdg7&st=2xgncup6&dl=1",
+          "type": "theory",
+          "id": "l-1782940303557"
         }
       ],
       "lecturesPractical": []
