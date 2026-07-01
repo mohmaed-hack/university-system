@@ -6,7 +6,9 @@
       "nameAr": "هندسة البرمجيات",
       "image": "/images/subjects/software-engineering.png",
       "side": "نظري فقط",
-      "instructorTheory": { "nameAr": "د. محمد الخولاني" }
+      "instructorTheory": {
+        "nameAr": "د. محمد الخولاني"
+      }
     },
     {
       "id": "s1-2",
@@ -14,9 +16,12 @@
       "nameAr": "إدارة مشاريع تقنية المعلومات",
       "image": "/images/subjects/it-project-management.png",
       "side": "نظري + عملي",
-      "instructorTheory": { "nameAr": "د. حسن الجرادي" },
-      "instructorPractical": { "nameAr": "أ. دلال" }
-
+      "instructorTheory": {
+        "nameAr": "د. حسن الجرادي"
+      },
+      "instructorPractical": {
+        "nameAr": "أ. دلال"
+      }
     },
     {
       "id": "s1-3",
@@ -24,7 +29,9 @@
       "nameAr": "ذكاء الأعمال",
       "image": "/images/subjects/business-intelligence.png",
       "side": "نظري فقط",
-      "instructorTheory": { "nameAr": "د. قيس النزيلي" }
+      "instructorTheory": {
+        "nameAr": "د. قيس النزيلي"
+      }
     },
     {
       "id": "s1-4",
@@ -32,8 +39,12 @@
       "nameAr": "تطوير تطبيقات قواعد البيانات",
       "image": "/images/subjects/developing-database-applications.png",
       "side": "نظري + عملي",
-      "instructorTheory": { "nameAr": "أ. أسماء" },
-      "instructorPractical": { "nameAr": "أ. أسماء" }
+      "instructorTheory": {
+        "nameAr": "أ. أسماء"
+      },
+      "instructorPractical": {
+        "nameAr": "أ. أسماء"
+      }
     },
     {
       "id": "s1-5",
@@ -41,7 +52,9 @@
       "nameAr": "إدارة تقنية المعلومات",
       "image": "/images/subjects/it-management.png",
       "side": "نظري فقط",
-      "instructorTheory": { "nameAr": "أ. زايد" }
+      "instructorTheory": {
+        "nameAr": "أ. زايد"
+      }
     },
     {
       "id": "s1-6",
@@ -49,8 +62,12 @@
       "nameAr": "الحوسبة السحابية وخدمات الويب",
       "image": "/images/subjects/cloud-computing.png",
       "side": "نظري + عملي",
-      "instructorTheory": { "nameAr": "د. محمد" },
-      "instructorPractical": { "nameAr": "أ. مريم" }
+      "instructorTheory": {
+        "nameAr": "د. محمد"
+      },
+      "instructorPractical": {
+        "nameAr": "أ. مريم"
+      }
     }
   ],
   "semester2": [
@@ -129,7 +146,16 @@
       "image": "/images/subjects/developing-database-applications.png",
       "semester": 1,
       "bookUrl": "https://drive.google.com/uc?export=download&id=1JMiWhTTtB5FhnVI5reIlSAakRsyPbhv8",
-      "lecturesTheory": [],
+      "lecturesTheory": [
+        {
+          "number": 1,
+          "title": "Introduction to MySQ",
+          "date": "2026-06-22",
+          "downloadUrl": "https://www.dropbox.com/scl/fi/6w5ey69ft5j8ywjonkd3i/Introduction-to-MySQL.pdf?rlkey=ddxnfxihj2wxnta8ecvq01r6z&st=9ztp3xu3&dl=1",
+          "type": "theory",
+          "id": "l-1782940248867"
+        }
+      ],
       "lecturesPractical": []
     },
     {
